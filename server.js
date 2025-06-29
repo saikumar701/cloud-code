@@ -4,16 +4,16 @@ const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
 const cors = require('cors');
-require('dotenv').config(); // Make sure to load .env
+require('dotenv').config();
 
 const ACTIONS = require('./src/actions/Actions');
 
 const server = http.createServer(app);
 
-// ✅ Allow frontend (React) to connect
+// ✅ Allow frontend (React) to connect (local dev)
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000", // frontend URL
+        origin: "http://localhost:3000",
         methods: ["GET", "POST"]
     }
 });
@@ -65,12 +65,12 @@ io.on('connection', (socket) => {
     });
 });
 
-// ✅ Serve frontend build only in production
+// ✅ Serve frontend build only in production (Render)
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, 'build')));
-
+    const buildPath = path.join(__dirname, 'client', 'build');
+    app.use(express.static(buildPath));
     app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+        res.sendFile(path.join(buildPath, 'index.html'));
     });
 } else {
     app.get('/', (req, res) => {
