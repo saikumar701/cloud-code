@@ -10,10 +10,10 @@ const ACTIONS = require('./src/actions/Actions');
 
 const server = http.createServer(app);
 
-// ✅ Allow frontend (React) to connect (local dev)
+// ✅ Allow frontend (React) to connect (for local dev)
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3000", // Allow React dev server during local dev
         methods: ["GET", "POST"]
     }
 });
@@ -65,9 +65,9 @@ io.on('connection', (socket) => {
     });
 });
 
-// ✅ Serve frontend build only in production (Render)
+// ✅ Serve frontend build only in production
 if (process.env.NODE_ENV === "production") {
-    const buildPath = path.join(__dirname, 'client', 'build');
+    const buildPath = path.join(__dirname, 'build'); // ✅ Not client/build
     app.use(express.static(buildPath));
     app.get('*', (req, res) => {
         res.sendFile(path.join(buildPath, 'index.html'));
@@ -78,5 +78,6 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-const PORT = process.env.SERVER_PORT || 5000;
+// ✅ Use custom port if provided via .env
+const PORT = process.env.SERVER_PORT || process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
